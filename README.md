@@ -7,8 +7,8 @@ Prerequisites:
 4. AWS copilot cli
 
 Deployment:
-1. Run "copilot init" in the root directory and name your application.
-2. Select type of service and name the service.
+1. Run "copilot init" in the root of the directory and name your application.
+2. Select type of service and type name of the service.
 3. Select the path of Dockerfile.
 
 Internally AWS Copilot cli uses CloudFormation service to deploy resources.
