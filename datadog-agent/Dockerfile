@@ -1,0 +1,1 @@
+FROM --platform=arm64 gcr.io/datadoghq/agent:latest

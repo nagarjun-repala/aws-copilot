@@ -15,6 +15,6 @@ public class DemoApplication {
 
 	@RequestMapping("/")
   public String home() {
-    return "Hello World from the application!";
+    return "Hello World from internal application!";
   }
 }
