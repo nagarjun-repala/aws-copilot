@@ -22,7 +22,7 @@ image:
   port: 8080
 
 cpu: 256       # Number of CPU units for the task.
-memory: 512    # Amount of memory in MiB used by the task.
+memory: 1024    # Amount of memory in MiB used by the task.
 platform: linux/arm64  # See https://aws.github.io/copilot-cli/docs/manifest/lb-web-service/#platform
 count: 1       # Number of tasks that should be running in your service.
 exec: true     # Enable running commands in your container.
@@ -30,15 +30,26 @@ exec: true     # Enable running commands in your container.
 # Optional fields for more advanced use-cases.
 #
 # variables:                    # Pass environment variables as key value pairs.
-#  LOG_LEVEL: info
+  # DD_DOGSTATSD_NON_LOCAL_TRAFFIC: true
 env_file: copilot/external-app/env/test.env
 environment:
   # prod:
   #   env_file: env/prod.env
   test:
     env_file: copilot/external-app/env/test.env
-secrets:                      # Pass secrets from AWS Systems Manager (SSM) Parameter Store.
- dd-api-key: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/dd-api-key  # The key is the name of the environment variable, the value is the name of the SSM parameter.
+# secrets:                      # Pass secrets from AWS Systems Manager (SSM) Parameter Store.
+#  dd-api-key: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/dd-api-key  # The key is the name of the environment variable, the value is the name of the SSM parameter.
+
+sidecars:
+  datadog:
+    image: gcr.io/datadoghq/agent:latest
+    variables:
+      DD_DOGSTATSD_NON_LOCAL_TRAFFIC: true
+      DD_SITE: datadoghq.com
+      ECS_FARGATE: true
+      DD_APM_ENABLED: true
+    secrets:      
+      DD_API_KEY: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/DD_API_KEY
 
 # You can override any of the values defined above by environment.
 # environments:
