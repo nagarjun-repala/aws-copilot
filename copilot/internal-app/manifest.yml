@@ -34,6 +34,26 @@ exec: true     # Enable running commands in your container.
 #environments:
 #  test:
 #    count: 2               # Number of tasks to run for the "test" environment.
+logging:
+  # The Fluent Bit image. (Optional, we'll use "public.ecr.aws/aws-observability/aws-for-fluent-bit:latest" by default)
+  image: "amazon/aws-for-fluent-bit:latest"
+  # The configuration options to send to the FireLens log driver. (Optional)
+  destination:
+    # logDriver: awsfirelens
+    Name: datadog
+    dd_service: java-internal-app
+    dd_source: javaapp
+    dd_tags: internal
+    provider: ecs
+  # Whether to include ECS metadata in logs. (Optional, default to true)
+  enableMetadata: true
+  # Secret to pass to the log configuration. (Optional)
+  secretOptions:
+    apikey: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/DD_API_KEY
+# The full config file path in your custom Fluent Bit image. (Optional)
+  configFilePath: /fluent-bit/configs/parse-json.conf
+
+
 sidecars:
   datadog:
     image: gcr.io/datadoghq/agent:latest

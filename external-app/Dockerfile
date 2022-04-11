@@ -18,4 +18,4 @@ COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 EXPOSE 8080
 # EXPOSE 8125
 RUN wget -O dd-java-agent.jar 'https://dtdg.co/latest-java-tracer'
-ENTRYPOINT ["java","-javaagent:/dd-java-agent.jar", "-Ddd.profiling.enabled=true","-XX:FlightRecorderOptions=stackdepth=256", "-Ddd.logs.injection=true", "-Ddd.trace.sample.rate=1", "-Ddd.service=java-app-external", "-Ddd.env=test", "-Ddd.version=1.0", "-cp","app:app/lib/*","com.example.demo.DemoApplication"]
+ENTRYPOINT ["java","-javaagent:/dd-java-agent.jar", "-Ddd.profiling.enabled=true","-XX:FlightRecorderOptions=stackdepth=256", "-Ddd.trace.sample.rate=1", "-cp","app:app/lib/*","com.example.demo.DemoApplication"]

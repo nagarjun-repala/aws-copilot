@@ -9,6 +9,9 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import org.apache.logging.log4j.ThreadContext;
+import datadog.trace.api.CorrelationIdentifier;
+import org.json.simple.JSONObject;
 
 @SpringBootApplication
 @RestController
@@ -20,7 +23,12 @@ public class DemoApplication {
 
 	@RequestMapping("/")
 public String home() throws IOException, InterruptedException{
-
+	JSONObject obj = new JSONObject();
+	
+	obj.put("dd.trace_id", CorrelationIdentifier.getTraceId());
+	obj.put("dd.span_id", CorrelationIdentifier.getSpanId());
+	obj.put("data", "Calling external application...");
+	System.out.println(obj);
 	return "Hello World from external application!";
   }
 	@RequestMapping("/internal")
@@ -36,6 +44,7 @@ public String internalApp() throws IOException, InterruptedException{
 
 		HttpResponse<String> response = client.send(request,
 				HttpResponse.BodyHandlers.ofString());
+	System.out.println("Calling internal application from external...");				
 		return response.body();					
 
 	}catch(InterruptedException e){
@@ -53,3 +62,9 @@ public String secret() throws IOException, InterruptedException{
   }    
     
 }
+
+
+
+
+
+// There must be spans started and active before this block.

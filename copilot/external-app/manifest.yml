@@ -29,27 +29,53 @@ exec: true     # Enable running commands in your container.
 
 # Optional fields for more advanced use-cases.
 #
-# variables:                    # Pass environment variables as key value pairs.
-  # DD_DOGSTATSD_NON_LOCAL_TRAFFIC: true
+variables:                    # Pass environment variables as key value pairs.
+  DD_LOGS_INJECTION: true
+  DD_ENV: test
+  DD_SERVICE: java-app-external
+  DD_VERSION: 2.0
+  DD_LOGS_ENABLED: true
+  DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL: true
+  DD_PROFILING_ENABLED: true
 env_file: copilot/external-app/env/test.env
 environment:
   # prod:
   #   env_file: env/prod.env
   test:
     env_file: copilot/external-app/env/test.env
-# secrets:                      # Pass secrets from AWS Systems Manager (SSM) Parameter Store.
-#  dd-api-key: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/dd-api-key  # The key is the name of the environment variable, the value is the name of the SSM parameter.
+
+logging:
+  # The Fluent Bit image. (Optional, we'll use "public.ecr.aws/aws-observability/aws-for-fluent-bit:latest" by default)
+  image: "amazon/aws-for-fluent-bit:latest"
+  # The configuration options to send to the FireLens log driver. (Optional)
+  destination:
+    # logDriver: awsfirelens
+    Name: datadog
+    dd_service: java-external-app
+    dd_source: javaapp
+    dd_tags: external
+    provider: ecs
+  # Whether to include ECS metadata in logs. (Optional, default to true)
+  enableMetadata: true
+  # Secret to pass to the log configuration. (Optional)
+  secretOptions:
+    apikey: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/DD_API_KEY
+# The full config file path in your custom Fluent Bit image. (Optional)
+  configFilePath: /fluent-bit/configs/parse-json.conf
 
 sidecars:
   datadog:
-    image: gcr.io/datadoghq/agent:latest
+    image: "gcr.io/datadoghq/agent:latest"
     variables:
       DD_DOGSTATSD_NON_LOCAL_TRAFFIC: true
       DD_SITE: datadoghq.com
       ECS_FARGATE: true
       DD_APM_ENABLED: true
+
     secrets:      
       DD_API_KEY: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/DD_API_KEY
+
+
 
 # You can override any of the values defined above by environment.
 # environments:
